@@ -32,7 +32,7 @@ SOURCE_FOLDERS := $(dir $(OBJS))
 all: $(NAME)
 
 run: $(NAME)
-	$(QEMU) -kernel $(NAME)
+	$(QEMU) -cdrom $(NAME).iso
 
 
 $(NAME): $(OBJS)
