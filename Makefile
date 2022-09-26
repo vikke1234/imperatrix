@@ -3,15 +3,19 @@ CC     	  := gcc
 AS        := gcc
 SHELL  	  := /bin/bash
 BUILD_DIR := build
+QEMU      := qemu-system-x86_64
 
 ASFLAGS   := -Wall -march=x86-64 -m32
-CFLAGS 	  := -Wall -Werror -Wconversion -std=c11 -nostartfiles -march=x86-64 -m32
+CFLAGS 	  := -Wall -Wextra -Werror -Wconversion \
+			 -std=c11 -ffreestanding -O2 -march=x86-64 -m32 \
+			 -T linker.ld -nostdlib
 CLEAN     := clean
 HIDE      := @
 
 MKDIR     := mkdir -p
 RM 		  := rm -f
 
+.PHONY: all run
 # Create build directory
 
 
@@ -22,6 +26,9 @@ OBJS := $(addsuffix .o, $(basename $(OBJS)))
 SOURCE_FOLDERS := $(dir $(OBJS))
 
 all: $(NAME)
+
+run: $(NAME)
+	$(QEMU) -kernel $(NAME)
 
 
 $(NAME): $(OBJS)
