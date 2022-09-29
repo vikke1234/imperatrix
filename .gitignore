@@ -1,2 +1,6 @@
 build
-imperatrix
+imperatrix*
+*.o
+*.dep
+*.a
+*.so
