@@ -1,10 +1,12 @@
 NAME := libc.a
 
 MKDIR := mkdir -p
+HIDE := @
 
 BUILD_DIR := build
 
-CFLAGS    := -nostdlib -nostdinc -nostartfiles -Wall -Werror -Wextra
+CFLAGS    := -nostdlib -nostdinc -nostartfiles -Wall -Werror -Wextra -m32\
+			 -march=x86-64
 CPPFLAGS  := -I$(PWD)
 ARFLAGS   := -rcs --target=elf32-x86-64
 
@@ -27,14 +29,13 @@ $(NAME): $(OBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)
 
 $(BUILD_DIR)/%.o: %.c
-	$(info building $@, dependencies $^)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+	$(HIDE) $(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 
 $(BUILD_DIR)/%.dep: %.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -M -MF $@ -MT $(@:.dep=.o) $^
+	$(HIDE) $(CC) $(CFLAGS) $(CPPFLAGS) -M -MF $@ -MT $(@:.dep=.o) $^
 
 $(BUILD_DIR):
-	$(MKDIR) $@
+	$(HIDE) $(MKDIR) $@
 
 
 -include $(RULES)

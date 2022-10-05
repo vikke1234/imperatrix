@@ -1,6 +1,6 @@
 #include <string.h>
 
-size_t strlen(const char * const restrict str) {
+size_t strlen(const char * str) {
     size_t len = 0ULL;
     while(str[len++])
         ; // null statement

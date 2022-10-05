@@ -4,3 +4,4 @@ imperatrix*
 *.dep
 *.a
 *.so
+.cache
