@@ -1,7 +1,8 @@
 include src/build.mk
 
 NAME   	  := imperatrix
-AS        := gcc
+AS 		  := clang
+CC 		  := clang
 SHELL  	  := /bin/bash
 BUILD_DIR := build
 ISO_DIR   := $(BUILD_DIR)/$(NAME)
@@ -11,15 +12,15 @@ LIBC := $(LIBC_DIR)/libc.a
 
 ASFLAGS   := -Wall -march=x86-64 -m32
 CFLAGS 	  := -Wall -Wextra -Werror -Wconversion \
-			 -std=c11 -march=x86-64 -m32 -g
+			 -std=c11 --target=x86_64 -m32 -g
 
-LDFLAGS   :=  -T linker.ld $(INCLUDE_DIRS:%=-I%) -L$(PWD) -l:src/stdlib/libc.a\
-			  -nostdlib -nostdinc -fno-PIE
-CPPFLAGS  :=
+LDFLAGS   :=  -T linker.ld -L$(PWD) \
+			  -nostdlib -fno-PIE
+CPPFLAGS  := $(INCLUDE_DIRS:%=-I%)
 
 HIDE      := @
 
-QEMU      := qemu-system-x86_64
+QEMU      := qemu-system-i386
 MKDIR     := mkdir -p
 CP        := cp
 MV        := mv
@@ -48,10 +49,11 @@ clean:
 $(NAME): $(OBJS) $(LIBC)
 	$(HIDE) $(MKDIR) $(BUILD_DIR)
 	$(info $@)
-	$(HIDE) $(CC) $(CFLAGS) $(CPPFLAGS) $(OBJS) -o $(NAME) $(LDFLAGS) -Xlinker -Map=output.map
+	$(HIDE) $(CC) $(CFLAGS) $(CPPFLAGS) $(OBJS) -o $(NAME) $(LDFLAGS) \
+		-lc -Xlinker -Map=output.map
 
 $(LIBC):
-	(cd $(LIBC_DIR) && make)
+	(cd $(LIBC_DIR) && $(MAKE) -B)
 
 $(NAME).iso: $(NAME)
 	$(HIDE) $(MKDIR) $(ISO_DIR)/boot/grub
@@ -62,11 +64,9 @@ $(NAME).iso: $(NAME)
 $(BUILD_DIR)/$(SRC_PREFIX)/%.o: $(SRC_PREFIX)/%.c
 	$(HIDE) $(MKDIR) $(@D)
 	$(info $@)
-	$(HIDE) $(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $< $(LDFLAGS)
+	$(HIDE) $(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 
 $(BUILD_DIR)/$(SRC_PREFIX)/%.o: $(SRC_PREFIX)/%.s
 	$(HIDE) $(MKDIR) $(@D)
 	$(info $@)
 	$(HIDE) $(AS) $(ASFLAGS) -c -o $@ $< $(LDFLAGS)
-
-
