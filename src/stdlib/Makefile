@@ -2,12 +2,14 @@ NAME := libc.a
 
 MKDIR := mkdir -p
 HIDE := @
+CC := clang
 
 BUILD_DIR := build
 
-CFLAGS    := -nostdlib -nostdinc -nostartfiles -Wall -Werror -Wextra -m32\
-			 -march=x86-64
+CFLAGS    := -Wall -Werror -Wextra -m32\
+			 --target=x86_64
 CPPFLAGS  := -I$(PWD)
+LDFLAGS   := -nostartfiles -nostdlib
 ARFLAGS   := -rcs --target=elf32-x86-64
 
 SRCS := \
