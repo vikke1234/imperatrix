@@ -5,3 +5,4 @@ imperatrix*
 *.a
 *.so
 .cache
+*.map

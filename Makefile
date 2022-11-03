@@ -3,19 +3,16 @@ include src/build.mk
 NAME   	  := imperatrix
 AS 		  := clang
 CC 		  := clang
-SHELL  	  := /bin/bash
 BUILD_DIR := build
 ISO_DIR   := $(BUILD_DIR)/$(NAME)
 LIBC_DIR  := $(SRC_PREFIX)/stdlib
 
 LIBC := $(LIBC_DIR)/libc.a
 
-ASFLAGS   := -Wall -march=x86-64 -m32
-CFLAGS 	  := -Wall -Wextra -Werror -Wconversion \
-			 -std=c11 --target=x86_64 -m32 -g
+CFLAGS 	  := -Wall -Wextra -Werror -Wconversion -std=c11 --target=i686-elf -ffreestanding -nostdlib -g
+ASFLAGS   := $(CFLAGS) -Wno-unused-command-line-argument
 
-LDFLAGS   :=  -T linker.ld -L$(PWD) \
-			  -nostdlib -fno-PIE
+LDFLAGS   :=  -T linker.ld -L$(PWD) -static -nostdlib -fno-PIE -ffreestanding
 CPPFLAGS  := $(INCLUDE_DIRS:%=-I%)
 
 HIDE      := @
@@ -46,11 +43,10 @@ run-debug:$(NAME).iso
 clean:
 	$(RM) -r $(BUILD_DIR)
 
-$(NAME): $(OBJS) $(LIBC)
+$(NAME): $(OBJS) $(LIBC) linker.ld
 	$(HIDE) $(MKDIR) $(BUILD_DIR)
 	$(info $@)
-	$(HIDE) $(CC) $(CFLAGS) $(CPPFLAGS) $(OBJS) -o $(NAME) $(LDFLAGS) \
-		-lc -Xlinker -Map=output.map
+	$(HIDE) $(CC) $(CFLAGS) $(CPPFLAGS) $(OBJS) -o $(NAME) $(LDFLAGS) $(LIBC) -Xlinker -Map=output.map
 
 $(LIBC):
 	(cd $(LIBC_DIR) && $(MAKE) -B)

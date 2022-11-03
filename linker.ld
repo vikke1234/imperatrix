@@ -11,6 +11,7 @@ SECTIONS
     {
         *(.multiboot)
         *(.text)
+	KEEP(*(.note.gnu.build-id))
     }
 
     .rodata BLOCK(4K) : ALIGN(4K)
